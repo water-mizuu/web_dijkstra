@@ -26,6 +26,7 @@ body {
   flex-direction: column;
 }
 
-.edge text {
-  color: grey !important;
+svg text {
+  cursor: default;
+  user-select: none;
 }

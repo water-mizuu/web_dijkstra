@@ -45,3 +45,23 @@ const previous = document.querySelector(".simulation-button.previous") as HTMLBu
 const next = document.querySelector(".simulation-button.next") as HTMLButtonElement;
 const simulation = new Simulation(graph, svg, { buttons: { previous, next } });
 simulation.init(A);
+
+const limit = 5;
+document.addEventListener("click", function (event) {
+  let node: Element | null = event.target as Element;
+  let depth = 0;
+  while (depth++ < limit && node != null && !node.classList.contains("node")) {
+    node = node.parentElement;
+  }
+
+  if (node != null) {
+    const parent = node;
+    const id = parent.querySelector("title")?.textContent;
+    if (id == null) return;
+
+    const startGraphNode = vertices.filter(s => s.id == parseInt(id))[0];
+    if (startGraphNode == null) return;
+
+    simulation.init(startGraphNode);
+  }
+});

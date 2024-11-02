@@ -17,16 +17,16 @@ export class WeightedGraph {
   public dot(): string {
     const buffer: string[] = [
       "graph G {\n",
-      `  node[shape="circle"];\n`,
+      `  graph[nodesep=2 mode="sgd" bgcolor=none];\n`,
       `  edge[len=2.0];\n`,
-      `  graph[nodesep=2,mode="sgd",bgcolor=none];\n`,
+      `  node[shape="circle" style="filled" fillcolor="white"];\n`,
     ];
 
     for (const vertex of this.vertices) {
       buffer.push(`  ${vertex.id}`);
 
       const name = vertex.label ?? vertex.id.toString();
-      buffer.push(`[label="${name}", xlabel=" "];\n`);
+      buffer.push(`[label="${name}" xlabel=" "];\n`);
     }
 
     const seenMap: DefaultMap<GraphNode, Set<GraphNode>> = new DefaultMap((_) => new Set());
@@ -89,6 +89,14 @@ export class WeightedGraph {
     const distances = new Map<GraphNode, number>();
 
     const visitedNodes = () => new Set(this.vertices.filter((s) => !notVisited.has(s)));
+
+    output.push({
+      visitedNodes: new Set(), //
+      predecessors: new Map(),
+      distances: new Map(),
+      node: start,
+      identifier: "indicate-start",
+    });
 
     for (const node of this.vertices) {
       notVisited.add(node);
@@ -197,7 +205,18 @@ export class WeightedGraph {
       notVisited.delete(shortest);
     }
 
+    const unusedEdges: [GraphNode, GraphNode][] = [];
+    for (const [left, right,] of this.edges) {
+      if (predecessors.get(right) == left || predecessors.get(left) == right) {
+        continue;
+      }
+
+      unusedEdges.push([left, right]);
+    }
+
     output.push({
+      startNode: start,
+      unusedEdges: unusedEdges,
       visitedNodes: visitedNodes(),
       predecessors: new Map(predecessors),
       distances: new Map(distances),
