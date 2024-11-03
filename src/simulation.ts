@@ -429,8 +429,8 @@ export class Simulation {
       const message = `All nodes have been resolved, so the algorithm is complete.`;
 
       for (const edge of current.unusedEdges) {
-        this.#highlightEdge(edge, "gray");
-        this.#highlightEdgeLabel(edge, "gray");
+        this.#highlightEdge(edge, "lightgray");
+        this.#highlightEdgeLabel(edge, "lightgray");
       }
 
       this.#highlightVertex(current.startNode, colors.start);
