@@ -1,7 +1,9 @@
 import "../styles.css";
 //
 import { instance } from "@viz-js/viz";
-import { GraphNode, WeightedGraph } from "./graph";
+import { debounce } from "./debounce";
+import { DefaultMap } from "./default_map";
+import { Edge, GraphNode, WeightedGraph } from "./graph";
 import { Simulation } from "./simulation";
 
 console.log("Hello World!");
@@ -16,35 +18,69 @@ const renderGraph: RenderGraph = (graph) => {
   return svg;
 };
 
-const A = { id: 0, label: "A" };
-const B = { id: 1, label: "B" };
-const C = { id: 2, label: "C" };
-const D = { id: 3, label: "D" };
-const E = { id: 4, label: "E" };
-const F = { id: 5, label: "F" };
-
-const vertices = [A, B, C, D, E, F];
-const edges: [GraphNode, GraphNode, number][] = [
-  [A, B, 9],
-  [A, C, 2],
-  [A, D, 4],
-  [C, D, 1],
-  [C, E, 3],
-  [E, D, 3],
-  [E, B, 4],
-  [B, D, 4],
-  [B, F, 3],
-  [E, F, 6],
-];
-
-const graph = new WeightedGraph(edges, vertices);
-const svg = renderGraph(graph);
-document.querySelector(".graph-svg-holder")?.appendChild(svg);
-
 const previous = document.querySelector(".simulation-button.previous") as HTMLButtonElement;
 const next = document.querySelector(".simulation-button.next") as HTMLButtonElement;
-const simulation = new Simulation(graph, svg, { buttons: { previous, next } });
-simulation.init(A);
+
+let vertices: GraphNode[];
+let simulation: Simulation;
+const holder = document.querySelector(".graph-svg-holder");
+const textArea = document.getElementById("input-textarea") as HTMLTextAreaElement | null
+const generateGraph = function (this: HTMLTextAreaElement) {
+  const map = new DefaultMap<string, GraphNode>((key, map) => ({ id: map.size, label: key }));
+
+  vertices = [];
+  const edges: Edge[] = [];
+
+  const lines = this.value.split("\n").map(s => s.trim());
+  const regex = /(\w+)\s+(\w+)\s+(\d+)/;
+  for (const line of lines) {
+    const match = regex.exec(line);
+    if (match == null) continue;
+
+    const [_, rawLeft, rawRight, rawWeight] = match;
+    const left = map.get(rawLeft);
+    const right = map.get(rawRight);
+    const weight = parseFloat(rawWeight);
+
+    if (!vertices.includes(left)) {
+      vertices.push(left);
+    }
+    if (!vertices.includes(right)) {
+      vertices.push(right);
+    }
+
+    edges.push([left, right, weight]);
+  }
+
+  const graph = new WeightedGraph(edges, vertices);
+  const svg = viz.renderSVGElement(graph.dot(), { engine: "neato" });
+  simulation = new Simulation(graph, svg, { buttons: { previous, next } });
+
+  if (holder != null) {
+    holder.innerHTML = "";
+    holder.appendChild(svg);
+  }
+
+  simulation.init(vertices[0]);
+};
+
+if (textArea != null) {
+  textArea.addEventListener("input", debounce(generateGraph.bind(textArea), 1000));
+  const initial = `
+A B 9
+A C 2
+A D 4
+B D 4
+B E 4
+B F 6
+C D 1
+C E 3
+D E 3
+E F 6`;
+  textArea.value = initial.trim();
+
+  generateGraph.call(textArea);
+}
 
 const limit = 5;
 document.addEventListener("click", function (event) {

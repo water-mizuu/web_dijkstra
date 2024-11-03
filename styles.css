@@ -30,3 +30,19 @@ svg text {
   cursor: default;
   user-select: none;
 }
+
+.expanded {
+  flex: 1;
+}
+
+div-column {
+  display: flex;
+  flex-direction: column;
+}
+
+div-row {
+  display: flex;
+  flex-direction: row;
+}
+
+textarea {resize: none;}

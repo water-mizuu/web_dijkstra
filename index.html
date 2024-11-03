@@ -7,11 +7,20 @@
   </head>
   <body>
     <h1>Dijkstra's Algorithm</h1>
-    <div class="graph-svg-holder"></div>
-    <div class="action-text-holder"><b>Action: </b> <span class="action-text"></span></div>
-    <div class="simulation-buttons">
-      <button class="simulation-button previous">&lt;&lt;</button>
-      <button class="simulation-button next">&gt;&gt;</button>
-    </div>
+    <div-row>
+      <div-column class="expanded">
+        <h3>Simulation</h3>
+        <div class="graph-svg-holder"></div>
+        <div class="action-text-holder"><b>Action: </b> <span class="action-text"></span></div>
+        <div class="simulation-buttons">
+          <button class="simulation-button previous">&lt;&lt;</button>
+          <button class="simulation-button next">&gt;&gt;</button>
+        </div>
+      </div-column>
+      <div-column class="expanded">
+        <h3>Input</h3>
+        <textarea id="input-textarea" rows="20"></textarea>
+      </div-column>
+    </div-row>
   </body>
 </html>

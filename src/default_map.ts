@@ -1,7 +1,7 @@
 export class DefaultMap<K, V> implements Map<K, V> {
   #inner: Map<K, V>;
 
-  constructor(public defaultValue: (key: K) => V) {
+  constructor(public defaultValue: (key: K, map: typeof this) => V) {
     this.#inner = new Map<K, V>();
   }
 
@@ -19,7 +19,7 @@ export class DefaultMap<K, V> implements Map<K, V> {
 
   get(key: K): V {
     if (this.#inner.get(key) == null) {
-      this.#inner.set(key, this.defaultValue(key));
+      this.#inner.set(key, this.defaultValue(key, this));
     }
 
     return this.#inner.get(key)!;
